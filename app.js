@@ -23,11 +23,19 @@ app.use("/admin", adminRoutes);
 
 app.use(shopRoutes);
 
+/** Render Templates */
+
 // setup 404
+// HTML Template
+// app.use((req, res, next) => {
+//   res.status(404).sendFile(path.join(__dirname, "views", "404.html"));
+// });
+
+// Pug
 app.use((req, res, next) => {
-  res
-    .status(404)
-    .sendFile(path.join(__dirname, "views", "page-not-found.html"));
+  res.status(404).render("404");
 });
+
+/** End render Templates */
 
 app.listen(3090);
