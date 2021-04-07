@@ -6,11 +6,20 @@ const router = express.Router();
 
 // Products data store
 const products = [];
+/** Render Templates */
+
+// Html template
+// router.get("/add-product", (req, res, next) => {
+//   res.sendFile(path.join(rootDir, "views", "add-product.html"));
+//   //....
+// });
 
 router.get("/add-product", (req, res, next) => {
-  res.sendFile(path.join(rootDir, "views", "add-product.html"));
+  res.render("add-product", { pageTitle: "Add Product" });
   //....
 });
+
+/** end Templates */
 
 router.post("/add-product", (req, res, next) => {
   console.log(req.body);
