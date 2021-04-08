@@ -14,7 +14,14 @@ const router = express.Router();
 
 // Pug template
 router.get("/", (req, res, next) => {
-  res.render("shop", { products, pageTitle: "My Shop", path: "/" });
+  res.render("shop", {
+    products,
+    pageTitle: "My Shop",
+    path: "/",
+    prodsGTZero: products.length > 0, // hack for handlebars
+    activeShop: true, // hack for handlebars,
+    productCss: true, // hack for handlebars
+  });
   //....
 });
 
