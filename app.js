@@ -1,6 +1,8 @@
 const path = require("path");
 const express = require("express");
 
+const exphbs = require("express-handlebars");
+
 // Import router middleware
 const { router: adminRoutes, products } = require("./routes/admin");
 
@@ -12,7 +14,24 @@ const bodyParser = require("body-parser");
 const app = express();
 
 /** Templates */
-app.set("view engine", "pug");
+// Register the handlebars engine
+app.engine(
+  "handlebars",
+  exphbs({
+    extname: "handlebars",
+    layoutsDir: "views/layout/", // Default location for handlebars
+    defaultLayout: "main-layout",
+    extname: "handlebars", // default is handlebars
+  })
+);
+// End register handlebars engine reg
+
+// Pug engine is builtin unlike handlebars above
+// using pug engine
+// app.set("view engine", "pug");
+
+// using handlebars engine
+app.set("view engine", "handlebars");
 app.set("views", "views");
 /** End Template */
 
