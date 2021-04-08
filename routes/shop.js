@@ -14,7 +14,7 @@ const router = express.Router();
 
 // Pug template
 router.get("/", (req, res, next) => {
-  res.render("shop", { products, docTitle: "My Shop" });
+  res.render("shop", { products, pageTitle: "My Shop", path: "/" });
   //....
 });
 
