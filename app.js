@@ -1,29 +1,27 @@
 const path = require("path");
 const express = require("express");
+const bodyParser = require("body-parser");
 
-const exphbs = require("express-handlebars");
+//const exphbs = require("express-handlebars");
 
 // Import router middleware
-const { router: adminRoutes, products } = require("./routes/admin");
-
+const { router: adminRoutes } = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
-
-const bodyParser = require("body-parser");
 
 // Create app
 const app = express();
 
 /** Templates */
 // Register the handlebars engine
-app.engine(
-  "handlebars",
-  exphbs({
-    extname: "handlebars",
-    layoutsDir: "views/layout/", // Default location for handlebars
-    defaultLayout: "main-layout",
-    extname: "handlebars", // default is handlebars
-  })
-);
+// app.engine(
+//   "handlebars",
+//   exphbs({
+//     extname: "handlebars",
+//     layoutsDir: "views/layout/", // Default location for handlebars
+//     defaultLayout: "main-layout",
+//     extname: "handlebars", // default is handlebars
+//   })
+// );
 // End register handlebars engine reg
 
 // Pug engine is builtin unlike handlebars above
@@ -31,7 +29,11 @@ app.engine(
 // app.set("view engine", "pug");
 
 // using handlebars engine
-app.set("view engine", "handlebars");
+//app.set("view engine", "handlebars");
+
+// using ejs
+app.set("view engine", "ejs");
+
 app.set("views", "views");
 /** End Template */
 
@@ -43,8 +45,7 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 /** Render Templates */
-
-// setup 404
+// setup 404 ..
 // HTML Template
 // app.use((req, res, next) => {
 //   res.status(404).sendFile(path.join(__dirname, "views", "404.html"));
@@ -52,7 +53,7 @@ app.use(shopRoutes);
 
 // Pug
 app.use((req, res, next) => {
-  res.status(404).render("404", { pageTile: "Page Not Found!" });
+  res.status(404).render("404", { pageTitle: "Page Not Found!" });
 });
 
 /** End render Templates */
