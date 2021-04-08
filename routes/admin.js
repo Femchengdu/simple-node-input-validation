@@ -1,38 +1,9 @@
-const path = require("path");
 const express = require("express");
-
-const rootDir = require("../utils/getPath");
+const { getAddProduct, postAddProduct } = require("../controllers/products");
 const router = express.Router();
 
-// Products data store
-const products = [];
-/** Render Templates */
+router.get("/add-product", getAddProduct);
 
-// Html template
-// router.get("/add-product", (req, res, next) => {
-//   res.sendFile(path.join(rootDir, "views", "add-product.html"));
-//   //....
-// });
+router.post("/add-product", postAddProduct);
 
-router.get("/add-product", (req, res, next) => {
-  res.render("add-product", {
-    pageTitle: "Add Product",
-    path: "/admin/add-product",
-    formCss: true, // Handlebars prop.
-    activeAddProduct: true, // Handlebars prop.
-    productCss: true, // hack for handlebars
-  });
-  //....
-});
-
-/** end Templates */
-
-router.post("/add-product", (req, res, next) => {
-  console.log(req.body);
-  const { title } = req.body;
-  products.push({ title });
-  res.redirect("/");
-});
-module.exports = { router, products };
-
-//zz
+module.exports = router;
