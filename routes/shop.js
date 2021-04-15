@@ -1,13 +1,14 @@
 const express = require("express");
 const {
   getProducts,
-  getCheckout,
+
   getCart,
   getIndex,
   getOrders,
   getProduct,
   postCart,
   postDeleteCartItem,
+  postOrders,
 } = require("../controllers/shop");
 
 const router = express.Router();
@@ -21,8 +22,7 @@ router.get("/cart", getCart);
 router.post("/cart", postCart);
 router.post("/delete-cart-item", postDeleteCartItem);
 router.get("/orders", getOrders);
-
-router.get("/checkout", getCheckout);
+router.post("/create-order", postOrders);
 
 /** End render template */
 
