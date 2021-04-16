@@ -1,14 +1,8 @@
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
-const sequelize = require("./utils/database");
-const Product = require("./models/product");
+const { mongoDbConnect } = require("./utils/database");
 const User = require("./models/user");
-const Cart = require("./models/cart");
-const CartItem = require("./models/cart-item");
-const Order = require("./models/order");
-const OrderItem = require("./models/order-item");
-
 // Import router middleware
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
@@ -30,9 +24,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  User.findByPk(1)
+  User.findById("6078bf13b7cd704361df0060")
     .then((user) => {
-      req.user = user;
+      const { username, email, cart, _id } = user;
+
+      req.user = new User(username, email, cart, _id);
       next();
     })
     .catch((error) => console.log(error));
@@ -45,37 +41,6 @@ app.use(shopRoutes);
 
 app.use(pathError);
 
-// Associations
-Product.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
-User.hasMany(Product);
-User.hasOne(Cart);
-Cart.belongsTo(User);
-Cart.hasMany(CartItem);
-Cart.belongsToMany(Product, { through: CartItem });
-Product.belongsToMany(Cart, { through: CartItem });
-Order.belongsTo(User);
-Order.hasMany(OrderItem);
-User.hasMany(Order);
-Order.belongsToMany(Product, { through: OrderItem });
-
-sequelize
-  //.sync({ force: true })
-  .sync()
-  .then((result) => {
-    return User.findByPk(1);
-  })
-  .then((user) => {
-    if (!user) {
-      return User.create({ name: "rDev", email: "rDev@internetdollars.com" });
-    } else {
-      // This is automatically wrapped in a promise
-      return user;
-    }
-  })
-  .then((user) => {
-    return user.createCart();
-  })
-  .then((cart) => {
-    app.listen(3090, () => console.log("App listening on port 3090"));
-  })
-  .catch((error) => console.log("Sync error :", error));
+mongoDbConnect(() => {
+  app.listen(3090, () => console.log("App listening on port 3090"));
+});

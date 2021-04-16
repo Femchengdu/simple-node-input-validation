@@ -49,12 +49,12 @@
         <div class="form-control">
           <label for="description">Description</label>
           <textarea type="text" name="description" id="description" rows="5">
-<% if (editing) { %><%= product.title %><% } %></textarea
+<% if (editing) { %><%= product.description %><% } %></textarea
           >
         </div>
 
         <% if (editing) { %>
-        <input type="hidden" name="productId" value="<%= product.id %>" />
+        <input type="hidden" name="productId" value="<%= product._id %>" />
 
         <% } %>
 

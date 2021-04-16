@@ -13,24 +13,22 @@
       <%if(products.length > 0) {%>
       <ul class="cart__item-list">
         <%products.forEach(product => {%>
-          
-        <li class="cart__item">
-          <p>
 
-            <%= product.title%> (<%= product.cartItem.quantity%>)</li>
-          </p>
+        <li class="cart__item">
+          <h1><%= product.title%></h1>
+          <h2><%= product.quantity%></h2>
+
           <form action="/delete-cart-item" method="post">
-            <input type="hidden" name="productId" value="<%= product.id %>">
-          <button class="btn" type="submit">Delete</button>
+            <input type="hidden" name="productId" value="<%= product._id %>" />
+            <button class="btn" type="submit">Delete</button>
           </form>
+        </li>
         <%})%>
       </ul>
-      <br>
-      <hr>
+      <br />
+      <hr />
       <div class="centered">
-
         <form action="/create-order" method="post">
-        
           <button class="btn">Order Now!!!</button>
         </form>
       </div>
