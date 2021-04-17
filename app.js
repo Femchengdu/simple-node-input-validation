@@ -1,7 +1,10 @@
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
-const { mongoDbConnect } = require("./utils/database");
+const mongoose = require("mongoose");
+const dbUrl =
+  "mongodb+srv://rDev:example2@cluster-node-mongo-db.e9wor.mongodb.net/shop?retryWrites=true&w=majority";
+
 const User = require("./models/user");
 // Import router middleware
 const adminRoutes = require("./routes/admin");
@@ -24,11 +27,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  User.findById("6078bf13b7cd704361df0060")
+  User.findById("607a5c291c7e0f73b56939e2")
     .then((user) => {
-      const { username, email, cart, _id } = user;
+      //const { username, email, cart, _id } = user;
 
-      req.user = new User(username, email, cart, _id);
+      req.user = user;
       next();
     })
     .catch((error) => console.log(error));
@@ -40,7 +43,24 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 app.use(pathError);
-
-mongoDbConnect(() => {
-  app.listen(3090, () => console.log("App listening on port 3090"));
-});
+// Test all goes well
+mongoose.set("useNewUrlParser", true);
+mongoose.set("useUnifiedTopology", true);
+mongoose
+  .connect(dbUrl)
+  .then((result) => {
+    User.findOne().then((user) => {
+      if (!user) {
+        const user = new User({
+          username: "rDev",
+          email: "rDev@internetdollars.com",
+          cart: {
+            items: [],
+          },
+        });
+        user.save();
+      }
+    });
+    app.listen(3090, () => console.log("Express server ready to serve!"));
+  })
+  .catch((error) => console.log(error));
