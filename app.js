@@ -7,6 +7,8 @@ const MDbSStore = require("connect-mongodb-session")(session);
 const MONGODB_URI =
   "mongodb+srv://rDev:example2@cluster-node-mongo-db.e9wor.mongodb.net/shop?retryWrites=true&w=majority";
 const User = require("./models/user");
+const csrf = require("csurf");
+const flash = require("connect-flash");
 // Import router middleware
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
@@ -19,6 +21,8 @@ const store = new MDbSStore({
   uri: MONGODB_URI,
   collection: "sessions",
 });
+
+const csrfProtection = csrf();
 
 /** Templates */
 // using ejs
@@ -38,6 +42,9 @@ app.use(
   })
 );
 
+app.use(csrfProtection);
+app.use(flash());
+
 app.use((req, res, next) => {
   if (!req.session.user) {
     return next();
@@ -48,6 +55,12 @@ app.use((req, res, next) => {
       next();
     })
     .catch((error) => console.log(error));
+});
+
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
 });
 
 // Routes and controllers
@@ -63,18 +76,6 @@ mongoose.set("useUnifiedTopology", true);
 mongoose
   .connect(MONGODB_URI)
   .then((result) => {
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({
-          username: "rDev",
-          email: "rDev@internetdollars.com",
-          cart: {
-            items: [],
-          },
-        });
-        user.save();
-      }
-    });
     app.listen(3090, () => console.log("Express server ready to serve!"));
   })
   .catch((error) => console.log(error));

@@ -11,3 +11,9 @@
 ### The app includes User, Cart, Order, Product and CartItem, and OrderItem models
 
 ### User auth state is managed using express-session and connect-mongodb-session
+
+### Added CSRF protection using csurf package
+
+### Added password hashing using bcrypt
+
+### Added UI message flashing using connect-flash
