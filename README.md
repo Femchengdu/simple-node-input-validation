@@ -17,3 +17,7 @@
 ### Added password hashing using bcrypt
 
 ### Added UI message flashing using connect-flash
+
+### Added Ability to reset password by email
+
+### Added authorization to athenticated users

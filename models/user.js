@@ -8,6 +8,8 @@ const userSchema = new Schema({
     required: true,
   },
   email: { type: String, required: true },
+  resetToken: String,
+  resetTokenExpiration: Date,
   cart: {
     items: [
       {
