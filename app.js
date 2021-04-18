@@ -2,35 +2,48 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const dbUrl =
+const session = require("express-session");
+const MDbSStore = require("connect-mongodb-session")(session);
+const MONGODB_URI =
   "mongodb+srv://rDev:example2@cluster-node-mongo-db.e9wor.mongodb.net/shop?retryWrites=true&w=majority";
-
 const User = require("./models/user");
 // Import router middleware
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+const authRoutes = require("./routes/auth");
 const { pathError } = require("./controllers/error");
 
 // Create app
 const app = express();
+const store = new MDbSStore({
+  uri: MONGODB_URI,
+  collection: "sessions",
+});
 
 /** Templates */
-
 // using ejs
 app.set("view engine", "ejs");
-
 app.set("views", "views");
 /** End Template */
 
 // Deprecation warning on bodyParser below.
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  session({
+    secret: "mySessionSecret",
+    resave: false,
+    saveUninitialized: false,
+    store,
+  })
+);
 
 app.use((req, res, next) => {
-  User.findById("607a5c291c7e0f73b56939e2")
+  if (!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
     .then((user) => {
-      //const { username, email, cart, _id } = user;
-
       req.user = user;
       next();
     })
@@ -41,13 +54,14 @@ app.use((req, res, next) => {
 app.use("/admin", adminRoutes);
 
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(pathError);
 // Test all goes well
 mongoose.set("useNewUrlParser", true);
 mongoose.set("useUnifiedTopology", true);
 mongoose
-  .connect(dbUrl)
+  .connect(MONGODB_URI)
   .then((result) => {
     User.findOne().then((user) => {
       if (!user) {
