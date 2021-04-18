@@ -9,3 +9,5 @@
 ### Records are stored in a Mongodb cloud database with a mongoose ODM connector.
 
 ### The app includes User, Cart, Order, Product and CartItem, and OrderItem models
+
+### User auth state is managed using express-session and connect-mongodb-session
