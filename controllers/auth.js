@@ -3,7 +3,7 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
-
+const { validationResult } = require("express-validator");
 const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
@@ -23,10 +23,24 @@ exports.getLogin = (req, res, next) => {
     path: "/login",
     pageTitle: "Login",
     errorMessage: message,
+    oldInput: { email: "", password: "" },
+    validationErrors: [],
   });
 };
 exports.postLogin = (req, res, next) => {
   const { email, password } = req.body;
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      pageTitle: "Login",
+      errorMessage: "Invalid email or password.",
+      oldInput: { email, password },
+      validationErrors: errors.array(),
+    });
+  }
+
   User.findOne({ email })
     .then((user) => {
       if (user) {
@@ -43,8 +57,13 @@ exports.postLogin = (req, res, next) => {
                 res.redirect("/");
               });
             } else {
-              req.flash("error", "Invalid email or password.");
-              return res.redirect("/login");
+              return res.status(422).render("auth/login", {
+                path: "/login",
+                pageTitle: "Login",
+                errorMessage: "Invalid email or password.",
+                oldInput: { email, password },
+                validationErrors: [],
+              });
             }
           })
           .catch((error) => {
@@ -52,8 +71,13 @@ exports.postLogin = (req, res, next) => {
             return res.redirect("/login");
           });
       } else {
-        req.flash("error", "Invalid email or password.");
-        return res.redirect("/login");
+        return res.status(422).render("auth/login", {
+          path: "/login",
+          pageTitle: "Login",
+          errorMessage: "Invalid email or password.",
+          oldInput: { email, password },
+          validationErrors: [],
+        });
       }
     })
     .catch((error) => console.log(error));
@@ -67,38 +91,39 @@ exports.postLogout = (req, res, next) => {
 
 exports.postSignup = (req, res, next) => {
   const { email, password, confirmPassword } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/signup", {
+      path: "/signup",
+      pageTitle: "Signup",
+      errorMessage: errors.array()[0].msg,
+      oldInput: { email, password, confirmPassword },
+      validationErrors: errors.array(),
+    });
+  }
 
-  User.findOne({ email })
-    .then((userDoc) => {
-      if (userDoc) {
-        req.flash("error", "E-Mail already exists.");
-        return res.redirect("/signup");
-      } else {
-        return bcrypt
-          .hash(password, 12)
-          .then((hashedPassword) => {
-            const user = new User({
-              email,
-              password: hashedPassword,
-              cart: { items: [] },
-            });
-            return user.save();
-          })
-          .then((result) => {
-            res.redirect("/login");
-            return transporter.sendMail({
-              to: email,
-              from: "rDev@nodeApp.com",
-              subject: "Signup Success",
-              html: "<h1>Signup Success!!!</h1>",
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
+  bcrypt
+    .hash(password, 12)
+    .then((hashedPassword) => {
+      const user = new User({
+        email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+      return user.save();
     })
-    .catch((error) => {});
+    .then((result) => {
+      res.redirect("/login");
+      return transporter.sendMail({
+        to: email,
+        from: "rDev@nodeApp.com",
+        subject: "Signup Success",
+        html: "<h1>Signup Success!!!</h1>",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 exports.getSignup = (req, res, next) => {
@@ -113,6 +138,8 @@ exports.getSignup = (req, res, next) => {
     path: "/signup",
     pageTitle: "Signup",
     errorMessage: message,
+    oldInput: { email: "", password: "", confirmPassword: "" },
+    validationErrors: [],
   });
 };
 
