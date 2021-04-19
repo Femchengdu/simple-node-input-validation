@@ -21,3 +21,5 @@
 ### Added Ability to reset password by email
 
 ### Added authorization to athenticated users
+
+### Added input validation using express validators
