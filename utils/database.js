@@ -1,11 +1,10 @@
 const mongodb = require("mongodb");
 
 const { MongoClient } = mongodb;
-const dbUrl =
-  "mongodb+srv://rDev:example2@cluster-node-mongo-db.e9wor.mongodb.net/shop?retryWrites=true&w=majority";
+
 let _mongoDbClient;
 const mongoDbConnect = (cb) => {
-  MongoClient.connect(dbUrl, { useUnifiedTopology: true })
+  MongoClient.connect(process.env.MONGODB_URI, { useUnifiedTopology: true })
     .then((client) => {
       console.log("Connected to the mongoDb server");
       _mongoDbClient = client.db();
