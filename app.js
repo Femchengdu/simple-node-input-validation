@@ -1,9 +1,9 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const dbUrl =
-  "mongodb+srv://rDev:example2@cluster-node-mongo-db.e9wor.mongodb.net/shop?retryWrites=true&w=majority";
 
 const User = require("./models/user");
 // Import router middleware
@@ -47,7 +47,7 @@ app.use(pathError);
 mongoose.set("useNewUrlParser", true);
 mongoose.set("useUnifiedTopology", true);
 mongoose
-  .connect(dbUrl)
+  .connect(process.env.MONGODB_URI)
   .then((result) => {
     User.findOne().then((user) => {
       if (!user) {
